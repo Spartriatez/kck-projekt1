@@ -13,6 +13,70 @@ from skimage.feature import (canny, match_descriptors, ORB, plot_matches)
 descriptor_extractor = ORB()
 
 nazwy = ['Algida','Allegro','Apple','Audi','Baidu','Bentley','Biedronka','Carrefour','Dell','Facebook','Fiat','Google','Heyah','Hyundai','Kia','Lidl','Mazda','Nasa','NFZ','Opel','Orlen','PKO BP','Poznan','PP','Roshen','Skoda','Sony','UAM','Ubuntu','Vizir','Vizir','Wedel','MS Windows','Winiary']
+logos = [
+#'Algida.png', 
+#'baidu.png', 
+#'dell.jpg', 
+#'google.png', 
+'Lidl_Stiftung_&_Co._KG_logo.svg.png', 
+#'Opel.jpg', 
+#'PUT.jpg', 
+#'t-mobile.ico', 
+#'vizir.png', 
+#'allegro.png', 
+#'Bentley.png', 
+#'facebook.2.png', 
+#'heyah.jpg', 
+#'Mazda.jpg', 
+#'Orlen.png', 
+#'Roshen.svg.png', 
+#'UAM.jpg', 
+#'wedel.jpg', 
+#'Apple.png', 
+'Biedronka.jpg', 
+#'facebook.png', 
+#'Hyundai.png', 
+'nasa.jpg', 
+#'PKO_Bank_Polski.jpg', 
+#'Skoda.png', 
+#'ubuntu.png', 
+#'windows.jpg', 
+#'Audi.png', 
+#'carrefour.jpg', 
+#'Fiat.jpg', 
+#'KIA.png', 
+'nfz.jpg'#, 
+#'poznań.jpg', 
+#'sony.png', 
+#'vizir2.jpg', 
+#'winiary.png'
+]
+
+photos = [
+'nfz.jpg', 
+'biedronka_wyprodukowano.jpg', 
+#'put_kalendarz.jpg', 
+'carrefour.jpeg', 
+'Apple-Logo-Tattoo-Collection-9.jpg', 
+#'Audi-symbol.jpg', 
+'biedronka.JPG', 
+'carrefour.jpg', 
+#'Czesi_polubili_stacji_5833331.jpg', 
+#'skoda.jpg', 
+#'ipad_4_back.jpg', 
+'lidl3.jpg', 
+'nfz_01.jpg', 
+'nfz_211124123123.jpg', 
+#'orlen_stacja_pkn.jpg', 
+#'Skoda logo History.jpg', 
+'TEST.jpg', 
+#'winiary-budyn655.png', 
+#'winiary_pomysl_na._makaronowa_patelnia_z_kurczakiem_curry_z_warzywami.jpg', 
+#'xperia-i4-black-1240x840-5879ae459411770f6c568b04f7861101.jpg', 
+#'xperia-z-ultra-waterproof-and-made-to-last-3ef42d23b915119a44798b765c6aee4a-940.jpg', 
+#'zagg-invisible-skin-ipad-2-2.jpg', 
+'Zielinski_Jaka-jest-rentownosc-biedronki.jpg'
+]
 
 cards=[]
 
@@ -80,7 +144,7 @@ def set_names(size):
 
 def recognize(pattern, name, scene):
     zipped_matches = []
-    match = match_descriptors(scene, pattern, cross_check=True, max_distance=0.5)
+    match = match_descriptors(scene, pattern, cross_check=True, max_distance=0.2)
     zipped_matches.append([match.size, name, match])
     return zipped_matches
 
@@ -93,10 +157,13 @@ def f_wrap(arg_list):
 def main():
     p = Pool(5)
     listing = os.listdir('logo')
-    zipped_patterns = p.map(load_pattenrs, listing)
+	
+    zipped_patterns = p.map(load_pattenrs, logos)
+    #zipped_patterns = p.map(load_pattenrs, listing)
     zipped_patterns = [ent for sublist in zipped_patterns for ent in sublist]
     listing = os.listdir('foto')
-    zipped_scenes = p.map(load_scenes, listing)
+    zipped_scenes = p.map(load_scenes, photos)
+    #zipped_scenes = p.map(load_scenes, listing)
     zipped_scenes = [ent for sublist in zipped_scenes for ent in sublist]
     zipped_patterns.sort(key=lambda x: x[3])
     p_img, patterns, p_key, tmp = zip(*zipped_patterns)
@@ -119,7 +186,7 @@ def main():
         for i in range(len(patterns)):
             el = abs((patterns[i].size/j.size) - 1)
             if matches[i] == best_match:
-                result += cards[i] + " "
+                result += logos[i] + " "#cards[i] + " "
             if matches[i] == best_match and el < proc:
                 proc = el
                 id = i
@@ -127,7 +194,8 @@ def main():
         plt.gray()
         plot_matches(ax, p_img[id], s_img[k], p_key[id], s_key[k], m_array[id])
         ax.axis('off')
-        plt.show()
+        plt.savefig('output/' + str(k) + '.png')
+#        plt.show()
         print (result)
         k += 1
 
